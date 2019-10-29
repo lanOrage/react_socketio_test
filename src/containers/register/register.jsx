@@ -1,80 +1,73 @@
 import React, {Component} from 'react'
-import {
-  NavBar,
-  WingBlank,
-  List,
-  InputItem,
-  WhiteSpace,
-  Button
-} from 'antd-mobile'
 import {connect} from 'react-redux'
+import {NavBar, WingBlank, List, WhiteSpace, InputItem, Radio, Button} from 'antd-mobile'
 import {Redirect} from 'react-router-dom'
 
 import Logo from '../../components/logo/logo'
-import {login} from '../../redux/actions'
+import {register} from '../../redux/actions'
 
-class Login extends Component {
-  state = {
+const ListItem = List.Item
+
+class Register extends Component {
+
+  state = { //就是一个user的信息，直接把整个状态传入请求中即为注册
     username: '',
     password: '',
+    password2: '',
+    type: 'dashen' 
   }
 
-  // 处理输入框/单选框变化, 收集数据到state
-  handleChange = (name, value) => {
-    this.setState({[name]: value})
+  handleChange = (type, value) => {
+    this.setState({
+      [type]: value
+    })
+  }
+  register = () => {
+    this.props.register(this.state)
+  }
+  goLogin = () => {
+    this.props.history.replace('/login')
   }
 
-  // 跳转到注册路由
-  toRegister = () => {
-    this.props.history.replace('/register')
-  }
-
-  // 登陆
-  login = () => {
-    const {username, password} = this.state
-    this.props.login(username, password)
-  }
-
-  render() {
-
+  render () {
+    const {type} = this.state
     const {redirectTo, msg} = this.props.user
-    if(redirectTo) {// 需要自动重定向
+    if(redirectTo) { // 需要自动重定向
       return <Redirect to={redirectTo}/>
     }
-
     return (
       <div>
-        <NavBar>硅谷直聘</NavBar>
+        <NavBar>用户注册</NavBar>
         <Logo/>
         <WingBlank>
           <List>
             {msg ? <p className='error-msg'>{msg}</p> : null}
-            <InputItem
-              placeholder='输入用户名'
-              onChange={val => this.handleChange('username', val)}
-            >
-              用户名:
-            </InputItem>
             <WhiteSpace/>
-            <InputItem
-              type='password'
-              placeholder='输入密码'
-              onChange={val => this.handleChange('password', val)}
-            >
-              密&nbsp;&nbsp;&nbsp;码:
-            </InputItem>
+            <InputItem placeholder="请输入用户名" onChange={val => this.handleChange('username', val)}>用户名:</InputItem>
             <WhiteSpace/>
-            <Button type='primary' onClick={this.login}>登&nbsp;&nbsp;&nbsp;陆</Button>
+            <InputItem type='password' placeholder="请输入密码" onChange={val => this.handleChange('password', val)}>密码:</InputItem>
             <WhiteSpace/>
-            <Button onClick={this.toRegister}>还没有账号</Button>
+            <InputItem type='password' placeholder="请输入确认密码" onChange={val => this.handleChange('password2', val)}>确认密码:</InputItem>
+            <WhiteSpace/>
+            <ListItem>
+              <span>用户类型:</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <Radio onChange={() => this.handleChange('type', 'dashen')} checked={type==='dashen'}>大神</Radio>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <Radio onChange={() => this.handleChange('type', 'laoban')} checked={type==='laoban'}>老板</Radio>
+            </ListItem>
+            <WhiteSpace/>
+
+            <Button type="primary" onClick={this.register}>注&nbsp;&nbsp;册</Button>
+            <WhiteSpace/>
+            <Button onClick={this.goLogin}>已有账户</Button>
           </List>
         </WingBlank>
       </div>
+
     )
   }
 }
 
 export default connect(
   state => ({user: state.user}),
-  {login}
-)(Login)
+  {register},
+)(Register)

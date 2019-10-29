@@ -1,8 +1,10 @@
 import React, {Component} from 'react'
-import {NavBar,WingBlank,List,InputItem,WhiteSpace,Button} from 'antd-mobile'
+import {NavBar,WingBlank,List,InputItem,WhiteSpace,Button,Toast} from 'antd-mobile'
 import {connect} from 'react-redux'
+import {Redirect} from 'react-router-dom'
 
 import Logo from '../../components/logo/logo'
+import {login} from '../../redux/actions'
 
 class Login extends Component {
   state={
@@ -19,14 +21,21 @@ class Login extends Component {
     // 发送请求验证是否通过
     this.props.login({username,password})
   }
+  toRegister = () => {
+    this.props.history.replace('/register')
+  }
   render() {
+    const {redirectTo, msg} = this.props.user
+    if(redirectTo) {// 查看状态信息中是否包含redirectto，有则需要自动重定向
+      return <Redirect to={redirectTo}/>
+    }
     return (
       <div>
         <NavBar>叨叨小橘</NavBar>
         <Logo/>
         <WingBlank>
           <List>
-            {msg ? <p className='error-msg'>{msg}</p> : null}
+            {msg ? Toast.fail(msg, 1) : null}
             <InputItem
               placeholder='输入用户名'
               onChange={val => this.handleChange('username', val)}
@@ -42,9 +51,9 @@ class Login extends Component {
               密&nbsp;&nbsp;&nbsp;码:
             </InputItem>
             <WhiteSpace/>
-            <Button type='primary' onClick={this.login}>登&nbsp;&nbsp;&nbsp;陆</Button>
+            <Button type='primary' onClick={this.login}>登&nbsp;&nbsp;&nbsp;&nbsp;录</Button>
             <WhiteSpace/>
-            <Button onClick={this.toRegister}>注&nbsp;&nbsp;&nbsp;册</Button>
+            <Button onClick={this.toRegister}>注&nbsp;&nbsp;&nbsp;&nbsp;册</Button>
           </List>
         </WingBlank>
       </div>
